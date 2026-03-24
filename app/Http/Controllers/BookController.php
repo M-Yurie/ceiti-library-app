@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
-use App\Models\User;
+use Illuminate\Http\Request;
 
 // protected $fillable = [
 //         'title',
@@ -25,23 +24,27 @@ class BookController extends Controller
     {
         $query = Book::query();
 
-        $query->where(function ($q) use ($request) {
-            $q->where('title', 'like', '%' . $request->search . '%')
-            ->orWhere('author', 'like', '%' . $request->search . '%');
-        });
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->search . '%')
+                    ->orWhere('author', 'like', '%' . $request->search . '%');
+            });
+        }
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        if ($request->filled('sort')) {
+        if (in_array($request->sort, ['asc', 'desc'], true)) {
             $query->orderBy('title', $request->sort);
+        } else {
+            $query->latest();
         }
 
-        $books = $query->latest()->paginate(10);
+        $books = $query->paginate(10)->withQueryString();
 
         if (auth()->check()) {
-            auth()->user()->load('favoriteBooks');
+            auth()->user()->loadMissing('favoriteBooks');
         }
 
         return view('books.index', compact('books'));
@@ -78,9 +81,20 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Book $book)
     {
-        //
+        $book->load([
+            'category',
+            'ratings.user',
+            'comments' => fn ($query) => $query->with('user')->latest(),
+        ]);
+
+        $averageRating = round((float) $book->ratings->avg('rating'), 1);
+        $userRating = auth()->user()?->ratings()
+            ->where('book_id', $book->id)
+            ->value('rating');
+
+        return view('books.show', compact('book', 'averageRating', 'userRating'));
     }
 
     /**

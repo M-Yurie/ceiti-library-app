@@ -46,6 +46,8 @@
         <p class="mb-3 text-gray-700">{{ $book->author }}</p>
 
         <div class="flex flex-wrap gap-3">
+            <a href="{{ route('books.show', $book) }}" class="text-blue-600">Details</a>
+
             <form action="{{ route('favorites.toggle', $book) }}" method="POST">
                 @csrf
                 <button type="submit" class="text-red-600">

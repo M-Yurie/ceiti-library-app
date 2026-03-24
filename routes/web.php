@@ -6,6 +6,7 @@ use App\Http\Controllers\BookCopyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,8 +23,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
+    Route::get('/books/{book}', [BookController::class, 'show'])->whereNumber('book')->name('books.show');
     Route::post('/favorites/{book}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/books/{book}/rating', [ReviewController::class, 'storeRating'])->whereNumber('book')->name('books.rating.store');
+    Route::post('/books/{book}/comment', [ReviewController::class, 'storeComment'])->whereNumber('book')->name('books.comment.store');
 });
 
 Route::middleware(['auth', 'role:librarian,admin'])->group(function () {
