@@ -17,6 +17,9 @@
             <a href="{{ route('dashboard') }}" class="block text-gray-700">Dashboard</a>
             <a href="{{ route('books.index') }}" class="block text-gray-700">Books</a>
             <a href="{{ route('favorites.index') }}" class="block text-gray-700">Favorites</a>
+            @if(auth()->user()->isAdmin() || auth()->user()->isLibrarian())
+                <a href="{{ route('loans.create') }}" class="block text-gray-700">Borrow Copy</a>
+            @endif
             <a href="{{ route('profile.edit') }}" class="block text-gray-700">Profile</a>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

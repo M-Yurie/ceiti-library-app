@@ -35,6 +35,9 @@ Route::middleware(['auth', 'role:librarian,admin'])->group(function () {
     Route::get('/books/{book}/copies', [BookCopyController::class, 'index'])->name('copies.index');
     Route::post('/books/{book}/copies', [BookCopyController::class, 'store'])->name('copies.store');
     Route::delete('/copies/{copy}', [BookCopyController::class, 'destroy'])->name('copies.destroy');
+    Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
+    Route::post('/loans/barcode', [LoanController::class, 'lookupByBarcode'])->name('loans.lookup');
+    Route::get('/loans/users/search', [LoanController::class, 'searchUsers'])->name('loans.users.search');
     Route::post('/loans/{copy}', [LoanController::class, 'store'])->name('loans.store');
     Route::post('/loans/{copy}/return', [LoanController::class, 'returnBook'])->name('loans.return');
     Route::get('/librarian/dashboard', [DashboardController::class, 'librarian'])

@@ -10,7 +10,7 @@ class BookCopyController extends Controller
 {
     public function index(Book $book)
     {
-        $copies = $book->copies;
+        $copies = $book->copies()->with('loan.user')->get();
         return view('copies.index', compact('book', 'copies'));
     }
 
