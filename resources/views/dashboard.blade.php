@@ -10,6 +10,9 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
+                    @if(auth()->user()->isAdmin())
+                        <a href="/admin">Admin Panel</a>
+                    @endif
                 </div>
             </div>
         </div>

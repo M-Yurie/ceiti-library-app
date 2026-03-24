@@ -23,6 +23,7 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
+
     /**
      * Handle an incoming registration request.
      *
@@ -40,6 +41,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => 'visitor'
         ]);
 
         event(new Registered($user));
