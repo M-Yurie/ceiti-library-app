@@ -10,10 +10,19 @@
         <p>Barcode: {{ $copy->barcode }}</p>
         <p>Status: {{ $copy->status }}</p>
 
-        <form method="POST" action="{{ route('copies.destroy', $copy) }}">
+        <form method="POST" action="{{ route('loans.store', $copy) }}">
             @csrf
-            @method('DELETE')
-            <button>Delete</button>
+
+            <input name="user_id" placeholder="User ID">
+            <input type="date" name="due_date">
+
+            <button type="submit">Borrow</button>
+        </form>
+
+        <form method="POST" action="{{ route('loans.return', $copy) }}">
+            @csrf
+
+            <button type="submit">Return</button>
         </form>
     </div>
 @endforeach

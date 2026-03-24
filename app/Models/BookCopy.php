@@ -22,6 +22,6 @@ class BookCopy extends Model
 
     public function loan()
     {
-        return $this->hasOne(Loan::class);
+        return $this->hasOne(Loan::class)->whereNull('returned_at');
     }
 }
