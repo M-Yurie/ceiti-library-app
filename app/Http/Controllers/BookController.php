@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Book;
+use App\Models\User;
 
 // protected $fillable = [
 //         'title',
@@ -20,9 +21,29 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::latest()->paginate(20);
+        $query = Book::query();
+
+        $query->where(function ($q) use ($request) {
+            $q->where('title', 'like', '%' . $request->search . '%')
+            ->orWhere('author', 'like', '%' . $request->search . '%');
+        });
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('sort')) {
+            $query->orderBy('title', $request->sort);
+        }
+
+        $books = $query->latest()->paginate(10);
+
+        if (auth()->check()) {
+            auth()->user()->load('favoriteBooks');
+        }
+
         return view('books.index', compact('books'));
     }
 

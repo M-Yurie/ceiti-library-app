@@ -52,9 +52,9 @@ class User extends Authenticatable
         return $this->hasMany(Loan::class);
     }
 
-    public function favorites()
+    public function favoriteBooks()
     {
-        return $this->hasMany(Favorite::class);
+        return $this->belongsToMany(Book::class, 'favorites');
     }
 
     public function ratings()
