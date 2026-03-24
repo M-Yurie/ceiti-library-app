@@ -14,9 +14,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:librarian,admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    });
+    Route::get('/dashboard', function () {return view('dashboard');});
+});
+
+Route::middleware(['auth', 'role:librarian,admin'])->group(function () {
+    Route::resource('books', \App\Http\Controllers\BookController::class);
 });
 
 require __DIR__.'/auth.php';
