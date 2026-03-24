@@ -8,6 +8,7 @@
         <p>{{ $book->author }}</p>
 
         <a href="{{ route('books.edit', $book) }}">Edit</a>
+        <a href="{{ route('copies.index', $book) }}">View Copies</a>
 
         <form method="POST" action="{{ route('books.destroy', $book) }}">
             @csrf
