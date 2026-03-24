@@ -5,13 +5,77 @@ namespace App\Http\Controllers;
 use App\Models\BookCopy;
 use App\Models\Loan;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class LoanController extends Controller
 {
+    public function myLoans(Request $request): View
+    {
+        $loans = Loan::query()
+            ->with(['bookCopy.book'])
+            ->where('user_id', $request->user()->id)
+            ->whereNull('returned_at')
+            ->latest('borrowed_at')
+            ->paginate(10);
+
+        return view('loans.my-loans', compact('loans'));
+    }
+
+    public function index(Request $request): View
+    {
+        $query = Loan::query()->with(['user', 'bookCopy.book']);
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($builder) use ($search) {
+                $builder->whereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%');
+                })->orWhereHas('bookCopy.book', function ($bookQuery) use ($search) {
+                    $bookQuery->where('title', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        if ($request->status === 'active') {
+            $query->whereNull('returned_at');
+        } elseif ($request->status === 'returned') {
+            $query->whereNotNull('returned_at');
+        }
+
+        $direction = $request->sort_direction === 'asc' ? 'asc' : 'desc';
+
+        switch ($request->sort_by) {
+            case 'user':
+                $query->orderBy(
+                    User::select('name')
+                        ->whereColumn('users.id', 'loans.user_id')
+                        ->limit(1),
+                    $direction
+                );
+                break;
+            case 'book':
+                $query->orderBy(
+                    BookCopy::select('books.title')
+                        ->join('books', 'books.id', '=', 'book_copies.book_id')
+                        ->whereColumn('book_copies.id', 'loans.book_copy_id')
+                        ->limit(1),
+                    $direction
+                );
+                break;
+            default:
+                $query->orderBy('borrowed_at', $direction);
+                break;
+        }
+
+        $loans = $query->paginate(15)->withQueryString();
+
+        return view('loans.index', compact('loans'));
+    }
+
     public function create(Request $request): View
     {
         $selectedCopy = null;

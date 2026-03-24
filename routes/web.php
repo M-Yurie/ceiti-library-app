@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/my-loans', [LoanController::class, 'myLoans'])->name('loans.mine');
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
     Route::get('/books/{book}', [BookController::class, 'show'])->whereNumber('book')->name('books.show');
     Route::post('/favorites/{book}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
@@ -35,6 +36,7 @@ Route::middleware(['auth', 'role:librarian,admin'])->group(function () {
     Route::get('/books/{book}/copies', [BookCopyController::class, 'index'])->name('copies.index');
     Route::post('/books/{book}/copies', [BookCopyController::class, 'store'])->name('copies.store');
     Route::delete('/copies/{copy}', [BookCopyController::class, 'destroy'])->name('copies.destroy');
+    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
     Route::get('/loans/create', [LoanController::class, 'create'])->name('loans.create');
     Route::post('/loans/barcode', [LoanController::class, 'lookupByBarcode'])->name('loans.lookup');
     Route::get('/loans/users/search', [LoanController::class, 'searchUsers'])->name('loans.users.search');
